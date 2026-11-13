@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="My Budget">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>My Budget</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--ink:#172033;--muted:#697386;--line:#e6eaf0;--green:#16865b;--greenbg:#e8f6ef;--blue:#315ee8;--amber:#a96812;--amberbg:#fff5df;--red:#b83d45;--radius:18px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:#101827;color:white;padding:calc(24px + env(safe-area-inset-top)) 18px 20px;border-radius:0 0 24px 24px}
+.wrap{max-width:760px;margin:auto;padding:0 14px 36px}
+.top{display:flex;justify-content:space-between;align-items:center}.brand{font-size:22px;font-weight:800;letter-spacing:-.5px}.sub{color:#b9c3d3;font-size:12px;margin-top:4px}
+.month{color:#d9e2ef;font-size:13px}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.heroBox{background:#1d2a40;border:1px solid #334158;border-radius:16px;padding:14px}.heroBox span{display:block;color:#b9c3d3;font-size:12px}.heroBox strong{display:block;font-size:25px;margin-top:7px}
+nav{display:flex;gap:7px;overflow:auto;padding:14px 0 10px;position:sticky;top:0;background:var(--bg);z-index:3}
+nav button{border:1px solid var(--line);background:white;color:var(--muted);padding:10px 13px;border-radius:999px;font-weight:650;white-space:nowrap}
+nav button.active{background:#172033;color:white;border-color:#172033}
+main{padding-top:5px}.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:17px;margin:10px 0;box-shadow:0 2px 8px #15213a08}
+h2{font-size:18px;margin:0 0 13px}h3{font-size:15px;margin:0}
+.muted{color:var(--muted);font-size:12px;line-height:1.45}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.big{font-size:27px;font-weight:800;letter-spacing:-.5px}.green{color:var(--green)}.pill{font-size:11px;border-radius:999px;padding:5px 8px;background:var(--greenbg);color:var(--green);font-weight:700}
+.progress{height:8px;border-radius:99px;background:#edf0f4;overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:var(--green);border-radius:99px}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0;padding-bottom:0}
+input,select{width:100%;padding:12px;border:1px solid #d9dee8;border-radius:11px;background:white;color:var(--ink);font:inherit;min-width:0}
+label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:11px 0 6px}
+button.primary{background:var(--green);color:white;border:0;padding:13px 15px;border-radius:12px;font-weight:750;width:100%;margin-top:13px}
+button.secondary{background:white;color:var(--ink);border:1px solid var(--line);padding:10px 12px;border-radius:11px;font-weight:650}
+button.danger{color:var(--red);background:white;border:1px solid #f0d6d8;padding:8px 10px;border-radius:9px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.amount{font-weight:750;font-variant-numeric:tabular-nums}
+.note{background:var(--amberbg);color:#80520e;padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin-top:12px}
+.smallrow{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--line)}
+.smallrow:last-child{border:0}
+.empty{text-align:center;padding:22px;color:var(--muted);font-size:13px}
+.check{width:20px;height:20px;accent-color:var(--green)}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
+@media(min-width:600px){.wrap{padding-left:20px;padding-right:20px}.heroBox strong{font-size:30px}}
+</style>
+<script src="config.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header><div class="wrap">
+ <div class="top"><div><div class="brand">My Budget 💵</div><div class="sub">A clear plan for every Friday paycheck</div></div><div class="month" id="monthLabel"></div></div>
+ <div class="hero">
+  <div class="heroBox"><span>Income recorded this month</span><strong id="incomeTotal">$0</strong></div>
+  <div class="heroBox"><span>Savings added this month</span><strong id="savingsTotal">$0</strong></div>
+ </div>
+</div></header>
+<div class="wrap">
+<section class="card" id="accountCard" style="margin-top:14px">
+ <div class="row"><h2>Private account & cloud backup</h2><span class="pill" id="syncStatus">Device only</span></div>
+ <div id="signedOutPanel">
+  <p class="muted">Create your private sign-in to sync this budget across devices. Your data is isolated to your account.</p>
+  <label for="accountEmail">Email</label><input id="accountEmail" type="email" autocomplete="email" placeholder="you@example.com">
+  <label for="accountPassword">Password</label><input id="accountPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8">
+  <div class="grid2"><button class="primary" id="signInBtn">Sign in</button><button class="secondary" id="signUpBtn" style="margin-top:13px">Create account</button></div>
+  <div class="muted" id="authMessage" aria-live="polite" style="margin-top:9px">Cloud sync needs a one-time secure backend setup. Until then, the app continues saving on this device.</div>
+ </div>
+ <div id="signedInPanel" hidden>
+  <p class="muted">Signed in as <strong id="accountLabel"></strong>. Your budget is linked to your private account.</p>
+  <div class="grid2"><button class="secondary" id="syncNowBtn">Sync now</button><button class="danger" id="signOutBtn">Sign out</button></div>
+ </div>
+</section>
+<nav>
+ <button class="active" data-tab="home">Overview</button><button data-tab="pay">Add paycheck</button><button data-tab="bills">Bills & goals</button><button data-tab="history">History</button>
+</nav>
+<main>
+<section class="panel active" id="home">
+ <div class="card">
+  <div class="row"><h2>Monthly budget progress</h2><span class="pill" id="monthStatus">In progress</span></div>
+  <div class="muted">See how much of each monthly target you've funded. Add paychecks as they arrive.</div>
+  <div id="budgetProgress"></div>
+ </div>
+ <div class="card">
+  <h2>Your priorities</h2>
+  <div class="smallrow"><span>1. Bills & recurring payments</span><strong>Keep due dates covered</strong></div>
+  <div class="smallrow"><span>2. Savings goal</span><strong>$700–$1,000 / month</strong></div>
+  <div class="smallrow"><span>3. Everyday spending</span><strong>Groceries & gas</strong></div>
+  <div class="smallrow"><span>4. Personal allowance</span><strong>$400–$600 / month</strong></div>
+ </div>
+ <div class="card">
+  <h2>Upcoming bill dates</h2><div id="upcoming"></div>
+ </div>
+ <div class="card">
+  <h2>Savings balance</h2>
+  <div class="big green" id="savingsBalance">$0</div>
+  <div class="muted">Total savings you've recorded in this app. This is a tracker, not a bank balance.</div>
+ </div>
+</section>
+<section class="panel" id="pay">
+ <div class="card">
+  <h2>Add your Friday paycheck</h2>
+  <div class="muted">Enter your take-home pay. The app will suggest an allocation using your monthly targets and what's already been funded.</div>
+  <label for="payDate">Payday</label><input type="date" id="payDate">
+  <label for="payAmount">Paycheck amount ($)</label><input id="payAmount" type="number" min="0" step=".01" placeholder="Example: 900">
+  <label for="saveChoice">Savings to add from this paycheck ($)</label><input id="saveChoice" type="number" min="0" step=".01" placeholder="Suggested amount appears below">
+  <div class="note" id="suggestion">Enter your paycheck to see a suggested plan.</div>
+  <button class="primary" id="recordPay">Save paycheck & allocation</button>
+ </div>
+ <div class="card">
+  <h2>How allocation works</h2>
+  <p class="muted">Your savings goal is prioritized, while bills due before your next payday need to stay covered. This first version records the plan only; it does not transfer money or pay bills.</p>
+ </div>
+</section>
+<section class="panel" id="bills">
+ <div class="card">
+  <h2>Bills and monthly targets</h2><div class="muted">These are your current planning estimates. Tap a bill to mark it paid for this month.</div>
+  <div id="billList"></div>
+ </div>
+ <div class="card">
+  <h2>Adjust a monthly target</h2>
+  <label for="editCategory">Category</label><select id="editCategory"></select>
+  <label for="editAmount">New monthly amount ($)</label><input id="editAmount" type="number" min="0" step=".01">
+  <button class="primary" id="saveTarget">Update target</button>
+  <div class="note">Your rent + utilities, phone, insurance, recurring payments, groceries, gas, personal spending and savings targets start with the amounts we've discussed. You can change them any time.</div>
+ </div>
+</section>
+<section class="panel" id="history">
+ <div class="card">
+  <h2>Paycheck history</h2><div id="historyList"></div>
+ </div>
+ <div class="card">
+  <h2>Backup your budget</h2>
+  <p class="muted">Your entries are saved on this device and, once you connect a private account, synced to your encrypted cloud database. Export a backup any time as an extra safety copy.</p>
+  <div class="note" id="safetyBox" hidden><span id="safetyText"></span><br><button class="secondary" id="safetyDownload" style="margin-top:8px">Download safety copy</button></div>
+  <button class="secondary" id="exportData" style="margin-top:12px">Export backup</button>
+  <label for="importFile">Restore from backup</label><input type="file" id="importFile" accept="application/json">
+  <button class="danger" id="resetData" style="margin-top:14px">Reset all app data</button>
+ </div>
+</section>
+</main>
+<footer>Private budget tracker • Account-isolated cloud sync when configured • No bank transfers</footer>
+</div>
+<script>
+const defaults=[
+ {id:"housing",name:"Rent + utilities",amount:1000,due:"End of month",kind:"bill"},
+ {id:"phone",name:"Phone",amount:50,due:"14th",kind:"bill"},
+ {id:"insurance",name:"Car insurance",amount:120,due:"Around 15th",kind:"bill"},
+ {id:"recurring",name:"Kept recurring payments",amount:221.87,due:"Automatic / various dates",kind:"bill"},
+ {id:"groceries",name:"Groceries",amount:150,due:"Monthly",kind:"spend"},
+ {id:"gas",name:"Gas",amount:435,due:"As needed",kind:"spend"},
+ {id:"personal",name:"Eating out, entertainment & personal",amount:500,due:"Monthly range: $400–$600",kind:"spend"},
+ {id:"savings",name:"Savings",amount:700,due:"Priority; stretch goal $1,000",kind:"savings"}
+];
+const key="myBudgetApp_v1", SAFETY_KEY=key+"_safetyCopy", TABLE="user_budgets";
+const blank=()=>({targets:defaults.map(x=>({...x})),paychecks:[],paid:{},savingsBalance:0,updatedAt:0});
+const validBudget=x=>!!x&&typeof x==="object"&&Array.isArray(x.targets)&&Array.isArray(x.paychecks);
+// Stable text form of a budget (ignores key order and the timestamp) for comparing copies.
+function stable(v){if(Array.isArray(v))return "["+v.map(stable).join(",")+"]";if(v&&typeof v==="object")return "{"+Object.keys(v).filter(k=>k!=="updatedAt").sort().map(k=>JSON.stringify(k)+":"+stable(v[k])).join(",")+"}";return JSON.stringify(v)}
+const pristineText=stable(blank());
+const hasData=x=>validBudget(x)&&stable({...blank(),...x})!==pristineText;
+let state=blank();
+try{const saved=JSON.parse(localStorage.getItem(key)||"null");if(validBudget(saved)){state={...state,...saved};if(!state.updatedAt)state.updatedAt=hasData(state)?1:0}}catch(e){}
+const $=id=>document.getElementById(id), money=n=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(Number(n)||0);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=new Date();const monthKey=d=>{let x=new Date(d+"T12:00:00");return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}`};
+const currentMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
+let supabaseClient=null, activeUser=null, syncTimer=null, syncing=false, syncAgain=false;
+function setSyncStatus(message){const el=$("syncStatus");if(el)el.textContent=message}
+function authMsg(t){$("authMessage").textContent=t}
+function saveLocal(){localStorage.setItem(key,JSON.stringify(state))}
+function persist(){state.updatedAt=Date.now();saveLocal();render();scheduleSync()}
+function scheduleSync(){if(activeUser&&supabaseClient){clearTimeout(syncTimer);syncTimer=setTimeout(syncWithCloud,700)}}
+const lastSyncKey=()=>key+"_lastSync_"+activeUser.id;
+function keepSafetyCopy(data,reason){try{localStorage.setItem(SAFETY_KEY,JSON.stringify({savedAt:new Date().toISOString(),reason,data}))}catch(e){console.error(e)}renderSafety()}
+function renderSafety(){let s=null;try{s=JSON.parse(localStorage.getItem(SAFETY_KEY)||"null")}catch(e){}const box=$("safetyBox");if(!s){box.hidden=true;return}box.hidden=false;$("safetyText").textContent=`Safety copy saved ${new Date(s.savedAt).toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}: ${s.reason}. Download it if anything looks missing.`}
+async function pushLocal(){
+ const {error}=await supabaseClient.from(TABLE).upsert({user_id:activeUser.id,budget_data:state,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+ if(error)throw error;
+ localStorage.setItem(lastSyncKey(),String(state.updatedAt||0));
+}
+function useCloudCopy(cloud,C){state={...blank(),...cloud,updatedAt:C};saveLocal();render();localStorage.setItem(lastSyncKey(),String(C))}
+// Two-way sync: read the cloud copy, keep the newer one, and never silently throw away the other.
+async function syncWithCloud(){
+ if(!activeUser||!supabaseClient)return;
+ if(syncing){syncAgain=true;return}
+ syncing=true;setSyncStatus("Syncing…");
+ try{
+  const {data:row,error}=await supabaseClient.from(TABLE).select("budget_data,updated_at").eq("user_id",activeUser.id).maybeSingle();
+  if(error)throw error;
+  const cloud=validBudget(row?.budget_data)?row.budget_data:null;
+  const lastSync=Number(localStorage.getItem(lastSyncKey()))||0;
+  const L=Number(state.updatedAt)||0, C=Number(cloud?.updatedAt)||0;
+  if(!cloud||(!hasData(cloud)&&C===0&&hasData(state))){await pushLocal();setSyncStatus("Cloud saved")}
+  else if(stable(cloud)===stable(state)){if(L!==C){state.updatedAt=Math.max(L,C);saveLocal()}localStorage.setItem(lastSyncKey(),String(state.updatedAt));setSyncStatus("Cloud synced")}
+  else if(!hasData(state)&&L<=lastSync){useCloudCopy(cloud,C);setSyncStatus("Cloud synced")}
+  else{
+   let takeCloud;
+   if(lastSync===0){
+    // First time this device links to the account and both have different budgets: ask.
+    takeCloud=confirm("Your account already has a saved budget, and this device has a different one.\n\nOK = use the budget saved in your account.\nCancel = keep this device's budget and save it to your account.\n\nEither way, the other copy is kept as a safety copy on this device.");
+   }else takeCloud=C>L;
+   if(takeCloud){keepSafetyCopy(state,"this device's budget before the account copy replaced it");useCloudCopy(cloud,C);setSyncStatus("Cloud synced")}
+   else{if(C>lastSync||lastSync===0)keepSafetyCopy(cloud,"the account's budget before this device's newer copy replaced it");await pushLocal();setSyncStatus("Cloud saved")}
+  }
+ }catch(e){console.error(e);setSyncStatus(navigator.onLine?"Sync issue":"Offline");authMsg(navigator.onLine?"Cloud sync problem: "+(e.message||"unknown error")+". Your budget is still saved on this device.":"You're offline. Changes are saved on this device and will sync when you're back online.")}
+ finally{syncing=false;if(syncAgain){syncAgain=false;syncWithCloud()}}
+}
+function showAccount(user){activeUser=user||null;$("signedOutPanel").hidden=!!user;$("signedInPanel").hidden=!user;if(user){$("accountLabel").textContent=user.email||"Private account";setSyncStatus("Connected")}else{setSyncStatus("Device only")}}
+function isSecretKey(k){if(/^sb_secret_/i.test(k))return true;try{const p=JSON.parse(atob(k.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));return p.role==="service_role"}catch(e){return false}}
+async function initCloud(){
+ const cfg=window.MY_BUDGET_SUPABASE||{}, k=String(cfg.publishableKey||cfg.anonKey||"").trim();
+ if(!cfg.url||!k||k.startsWith("PASTE")){authMsg("Cloud sync isn't switched on yet: the publishable key still needs to be added to config.js. Your budget is still saved on this device.");return}
+ if(isSecretKey(k)){authMsg("Security stop: config.js contains a SECRET key. Remove it and use your publishable key (starts with sb_publishable_). Cloud sync is off until then.");return}
+ if(!window.supabase){authMsg("Couldn't load the sign-in system (you may be offline). Your budget is still saved on this device.");return}
+ try{
+  supabaseClient=window.supabase.createClient(cfg.url,k,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  supabaseClient.auth.onAuthStateChange((event,session)=>{const u=session?.user||null,changed=(u?.id||null)!==(activeUser?.id||null);showAccount(u);if(u&&(changed||event==="SIGNED_IN"))setTimeout(syncWithCloud,0)});
+  authMsg("Sign in with your email and password, or create your account.");
+ }catch(e){authMsg("Cloud setup could not be reached. Device-only saving remains available.");console.error(e)}
+}
+function friendlyAuthError(e){const m=(e&&e.message)||"";if(/invalid login/i.test(m))return "Email or password is incorrect.";if(/not confirmed/i.test(m))return "Please confirm your email first (check your inbox), then sign in.";if(/already registered|already been registered/i.test(m))return "That email already has an account. Tap Sign in instead.";return m||"Sign-in failed."}
+async function authAction(mode){
+ if(!supabaseClient){authMsg("Cloud login isn't switched on yet. The publishable key needs to be added to config.js.");return}
+ const email=$("accountEmail").value.trim(),password=$("accountPassword").value;
+ if(!/^\S+@\S+\.\S+$/.test(email)||password.length<8){authMsg("Enter a valid email and a password with at least 8 characters.");return}
+ authMsg("Working…");
+ try{
+  const redirect=/^https?:/.test(location.protocol)?location.origin+location.pathname:undefined;
+  const result=mode==="signup"?await supabaseClient.auth.signUp({email,password,options:redirect?{emailRedirectTo:redirect}:{}}):await supabaseClient.auth.signInWithPassword({email,password});
+  if(result.error)throw result.error;
+  $("accountPassword").value="";
+  if(mode==="signup"&&!result.data.session)authMsg("Account created. Check your email and tap the confirmation link, then come back and sign in.");
+  else authMsg("Signed in. Loading your private budget…");
+ }catch(e){authMsg(friendlyAuthError(e))}
+}
+$("signInBtn").addEventListener("click",()=>authAction("signin"));$("signUpBtn").addEventListener("click",()=>authAction("signup"));
+$("signOutBtn").addEventListener("click",async()=>{if(!supabaseClient)return;clearTimeout(syncTimer);await syncWithCloud();const {error}=await supabaseClient.auth.signOut();if(error)alert(error.message);else authMsg("Signed out. Your budget stays saved on this device.")});
+$("syncNowBtn").addEventListener("click",()=>{clearTimeout(syncTimer);syncWithCloud()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&activeUser)syncWithCloud()});
+window.addEventListener("online",()=>{if(activeUser)syncWithCloud()});
+function monthPays(){return state.paychecks.filter(p=>monthKey(p.date)===currentMonth)}
+function monthIncome(){return monthPays().reduce((s,p)=>s+p.amount,0)}
+function monthSaved(){return monthPays().reduce((s,p)=>s+p.savings,0)}
+function funded(id){return monthPays().reduce((s,p)=>s+(p.allocations?.[id]||0),0)}
+function render(){
+ $("monthLabel").textContent=today.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+ $("incomeTotal").textContent=money(monthIncome());$("savingsTotal").textContent=money(monthSaved());$("savingsBalance").textContent=money(state.savingsBalance);
+ $("budgetProgress").innerHTML=state.targets.map(t=>{let f=funded(t.id),pct=Math.min(100,t.amount?f/t.amount*100:0);return `<div class="item"><div class="row"><div><h3>${esc(t.name)}</h3><div class="muted">${money(f)} funded of ${money(t.amount)}</div></div><strong class="amount">${Math.round(pct)}%</strong></div><div class="progress"><i style="width:${pct}%"></i></div></div>`}).join("");
+ const upcoming=state.targets.filter(t=>["housing","phone","insurance","recurring"].includes(t.id));
+ $("upcoming").innerHTML=upcoming.map(t=>`<div class="smallrow"><span>${esc(t.name)}<br><small class="muted">${esc(t.due)}</small></span><strong>${money(t.amount)}</strong></div>`).join("");
+ $("billList").innerHTML=state.targets.map(t=>{let paid=!!state.paid[currentMonth+"_"+t.id];return `<div class="item"><div class="row"><div><h3>${esc(t.name)}</h3><div class="muted">${esc(t.due)} • ${money(t.amount)}/month</div></div><label style="display:flex;align-items:center;gap:7px;margin:0"><input class="check paidToggle" type="checkbox" data-id="${esc(t.id)}" ${paid?"checked":""}> <span class="muted">Paid</span></label></div></div>`}).join("");
+ document.querySelectorAll(".paidToggle").forEach(el=>el.addEventListener("change",e=>{state.paid[currentMonth+"_"+e.target.dataset.id]=e.target.checked;persist()}));
+ $("historyList").innerHTML=state.paychecks.length?state.paychecks.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="item"><div class="row"><div><strong>${new Date(p.date+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</strong><div class="muted">Savings added: ${money(p.savings)}</div></div><strong class="amount">${money(p.amount)}</strong></div></div>`).join(""):`<div class="empty">No paychecks recorded yet. Your first Friday deposit will appear here.</div>`;
+ const sel=$("editCategory").value;$("editCategory").innerHTML=state.targets.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("");if(sel)$("editCategory").value=sel;
+}
+function remainingPaydays(dateStr){
+ const d=new Date(dateStr+"T12:00:00"), end=new Date(d.getFullYear(),d.getMonth()+1,0,12);
+ let n=0;for(let x=new Date(d);x<=end;x.setDate(x.getDate()+1)){if(x.getDay()===5)n++}
+ return Math.max(1,n);
+}
+function buildAllocation(amount,dateStr,savingsOverride){
+ const count=remainingPaydays(dateStr),alloc={};let left=amount;
+ const ordered=[...state.targets].sort((a,b)=>{
+  const rank={housing:0,phone:1,insurance:2,recurring:3,savings:4,groceries:5,gas:6,personal:7};
+  return (rank[a.id]??8)-(rank[b.id]??8);
+ });
+ for(const t of ordered){
+  const need=Math.max(0,t.amount-funded(t.id));
+  const suggested=need/count;
+  const desired=t.id==="savings"&&savingsOverride!==undefined?savingsOverride:suggested;
+  const put=Math.min(left,Math.max(0,desired));
+  alloc[t.id]=Math.round(put*100)/100;left=Math.round((left-put)*100)/100;
+ }
+ return {alloc,left};
+}
+function planHtml(title,plan,note){return `<strong>${title}</strong><br>${state.targets.map(t=>`${esc(t.name)}: <b>${money(plan.alloc[t.id]||0)}</b>`).join("<br>")}<br><br>Unallocated: <b>${money(plan.left)}</b><br><small>${note}</small>`}
+function suggestion(){
+ const amt=Number($("payAmount").value)||0,date=$("payDate").value;
+ if(!amt||!date){$("suggestion").textContent="Enter your paycheck to see a suggested plan.";return}
+ const plan=buildAllocation(amt,date),save=plan.alloc.savings||0;
+ $("saveChoice").value=save.toFixed(2);
+ $("suggestion").innerHTML=planHtml("Suggested paycheck plan",plan,"Targets are spread across the remaining Friday paydays this month. Upcoming fixed bills are protected first, then savings, then everyday spending. Adjust savings if needed.");
+}
+$("payDate").value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+$("payAmount").addEventListener("input",suggestion);$("payDate").addEventListener("change",suggestion);
+$("saveChoice").addEventListener("input",()=>{const amt=Number($("payAmount").value)||0,date=$("payDate").value;if(!amt||!date)return;const plan=buildAllocation(amt,date,Number($("saveChoice").value)||0);$("suggestion").innerHTML=planHtml("Updated paycheck plan",plan,"Fixed bills are protected first, then your chosen savings amount, then everyday spending.")});
+$("recordPay").addEventListener("click",()=>{
+ const amount=Number($("payAmount").value),date=$("payDate").value,savings=Number($("saveChoice").value)||0;
+ if(!date||!amount||amount<=0){alert("Enter a payday and a paycheck amount greater than $0.");return}
+ if(savings<0||savings>amount){alert("Savings must be between $0 and the paycheck amount.");return}
+ const plan=buildAllocation(amount,date,savings),allocations=plan.alloc;
+ state.paychecks.push({id:Date.now(),date,amount,savings,allocations});
+ state.savingsBalance+=savings;persist();$("payAmount").value="";$("saveChoice").value="";$("suggestion").textContent="Enter your paycheck to see a suggested plan.";alert("Paycheck saved to your budget history.");document.querySelector('[data-tab="home"]').click();
+});
+$("saveTarget").addEventListener("click",()=>{const id=$("editCategory").value,raw=$("editAmount").value,amt=Number(raw);if(raw===""||amt<0||!Number.isFinite(amt)){alert("Enter a valid monthly amount.");return}const t=state.targets.find(x=>x.id===id);if(t)t.amount=amt;persist();$("editAmount").value=""});
+$("editCategory").addEventListener("change",()=>{const t=state.targets.find(x=>x.id===$("editCategory").value);$("editAmount").value=t?.amount??""});
+function downloadJson(obj,name){const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+$("exportData").addEventListener("click",()=>downloadJson(state,`my-budget-backup-${new Date().toISOString().slice(0,10)}.json`));
+$("safetyDownload").addEventListener("click",()=>{try{const s=JSON.parse(localStorage.getItem(SAFETY_KEY));downloadJson(s.data,"my-budget-safety-copy.json")}catch(e){alert("No safety copy found.")}});
+$("importFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!validBudget(x))throw Error();if(hasData(state))keepSafetyCopy(state,"your budget before restoring a backup file");state={...blank(),...x};persist();alert("Backup restored.")}catch(err){alert("That backup file could not be read.")}e.target.value=""});
+$("resetData").addEventListener("click",()=>{if(confirm("Delete all budget entries?"+(activeUser?" This also clears the copy saved in your account.":"")+" Export a backup first if you want to keep them.")){if(hasData(state))keepSafetyCopy(state,"your budget before Reset");state=blank();persist()}});
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.toggle("active",x.id===b.dataset.tab))}));
+render();renderSafety();
+initCloud();
+</script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {})); }</script>
+</body></html>
