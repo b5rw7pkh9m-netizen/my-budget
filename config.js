@@ -4,5 +4,5 @@
 // NEVER put a secret key (sb_secret_...) or service_role key in this file.
 window.MY_BUDGET_SUPABASE = {
   url: "https://viedzvgclzgpzrymlfff.supabase.co",
-  publishableKey: "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+  publishableKey: "sb_publishable_mD4Q2qZtvjZT8rc-tk1onw_qJH5SZ3E"
 };
