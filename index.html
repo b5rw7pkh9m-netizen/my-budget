@@ -114,7 +114,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
  </div>
  <div class="card">
   <h2>How allocation works</h2>
-  <p class="muted">Your savings goal is prioritized, while bills due before your next payday need to stay covered. This first version records the plan only; it does not transfer money or pay bills.</p>
+  <p class="muted">1. This week’s share of gas and groceries.<br>2. Bills are paid off completely, earliest due date first (recurring, phone, insurance, then rent).<br>3. Whatever is left is split evenly between savings, groceries, gas and personal, until each reaches its monthly target.<br>4. Once every target is full, extra goes to savings.<br><br>This records the plan only; it does not move money or pay bills.</p>
  </div>
 </section>
 <section class="panel" id="bills">
@@ -267,34 +267,44 @@ function remainingPaydays(dateStr){
  let n=0;for(let x=new Date(d);x<=end;x.setDate(x.getDate()+1)){if(x.getDay()===5)n++}
  return Math.max(1,n);
 }
+// Completion-based plan, worked out in cents:
+// 1) this paycheck's share of gas + groceries, 2) finish bills completely in due-date order,
+// 3) your typed savings amount (if any), 4) split the rest evenly across savings/groceries/gas/personal,
+//    filling each goal up to its monthly target, 5) anything beyond every target goes to savings.
+const DUE_DAY={recurring:1,phone:14,insurance:15,housing:31};
 function buildAllocation(amount,dateStr,savingsOverride){
- const count=remainingPaydays(dateStr),alloc={};let left=amount;
- const ordered=[...state.targets].sort((a,b)=>{
-  const rank={housing:0,phone:1,insurance:2,recurring:3,savings:4,groceries:5,gas:6,personal:7};
-  return (rank[a.id]??8)-(rank[b.id]??8);
- });
- for(const t of ordered){
-  const need=Math.max(0,t.amount-funded(t.id));
-  const suggested=need/count;
-  const desired=t.id==="savings"&&savingsOverride!==undefined?savingsOverride:suggested;
-  const put=Math.min(left,Math.max(0,desired));
-  alloc[t.id]=Math.round(put*100)/100;left=Math.round((left-put)*100)/100;
+ const count=remainingPaydays(dateStr),alloc={},has=id=>state.targets.some(t=>t.id===id);
+ let left=Math.round(amount*100);
+ const target=id=>Math.round((state.targets.find(t=>t.id===id)?.amount||0)*100);
+ const need=id=>Math.max(0,target(id)-Math.round(funded(id)*100)-(alloc[id]||0));
+ const give=(id,c)=>{c=Math.max(0,Math.min(left,Math.floor(c)));alloc[id]=(alloc[id]||0)+c;left-=c};
+ state.targets.forEach(t=>alloc[t.id]=0);
+ ["gas","groceries"].filter(has).forEach(id=>give(id,need(id)/count));
+ state.targets.filter(t=>t.kind==="bill").sort((a,b)=>(DUE_DAY[a.id]??28)-(DUE_DAY[b.id]??28)).forEach(t=>give(t.id,need(t.id)));
+ const typed=savingsOverride!==undefined&&has("savings");
+ if(typed)give("savings",Math.round(savingsOverride*100));
+ const pool=["savings","groceries","gas","personal"].filter(id=>has(id)&&!(id==="savings"&&typed));
+ for(let guard=0;left>0&&guard<50;guard++){
+  const open=pool.filter(id=>need(id)>0);if(!open.length)break;
+  const each=Math.floor(left/open.length);
+  if(each===0){open.slice(0,left).forEach(id=>give(id,1));break}
+  open.forEach(id=>give(id,Math.min(each,need(id))));
  }
- // No unallocated money: extra goes to savings. If you typed your own savings amount, extra goes to personal spending instead.
- if(left>0){const dest=savingsOverride===undefined||!state.targets.some(t=>t.id==="personal")?"savings":"personal";alloc[dest]=Math.round(((alloc[dest]||0)+left)*100)/100;left=0}
- return {alloc,left};
+ if(left>0){const dest=!typed&&has("savings")?"savings":has("personal")?"personal":state.targets[0].id;give(dest,left)}
+ Object.keys(alloc).forEach(k=>alloc[k]=alloc[k]/100);
+ return {alloc,left:0};
 }
-function planHtml(title,plan,note){return `<strong>${title}</strong><br>${state.targets.map(t=>`${esc(t.name)}: <b>${money(plan.alloc[t.id]||0)}</b>`).join("<br>")}<br><br><small>Every dollar of this paycheck is assigned. ${note}</small>`}
+function planHtml(title,plan,note){return `<strong>${title}</strong><br>${state.targets.map(t=>{const done=t.amount>0&&funded(t.id)+(plan.alloc[t.id]||0)>=t.amount-0.005;return `${esc(t.name)}: <b>${money(plan.alloc[t.id]||0)}</b>${done?" ✓ done for the month":""}`}).join("<br>")}<br><br><small>Every dollar of this paycheck is assigned. ${note}</small>`}
 function suggestion(){
  const amt=Number($("payAmount").value)||0,date=$("payDate").value;
  if(!amt||!date){$("suggestion").textContent="Enter your paycheck to see a suggested plan.";return}
  const plan=buildAllocation(amt,date),save=plan.alloc.savings||0;
  $("saveChoice").value=save.toFixed(2);
- $("suggestion").innerHTML=planHtml("Suggested paycheck plan",plan,"Bills are covered first, then savings, then everyday spending. Anything extra goes to savings. If you lower the savings amount, the difference goes to personal spending.");
+ $("suggestion").innerHTML=planHtml("Suggested paycheck plan",plan,"This week’s gas and groceries come first, then bills are paid off completely in due-date order. The rest is split evenly between savings, groceries, gas and personal until each is full; extra goes to savings.");
 }
 $("payDate").value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
 $("payAmount").addEventListener("input",suggestion);$("payDate").addEventListener("change",suggestion);
-$("saveChoice").addEventListener("input",()=>{const amt=Number($("payAmount").value)||0,date=$("payDate").value;if(!amt||!date)return;const plan=buildAllocation(amt,date,Number($("saveChoice").value)||0);$("suggestion").innerHTML=planHtml("Updated paycheck plan",plan,"Bills are covered first, then your chosen savings amount, then everyday spending. Anything extra goes to personal spending.")});
+$("saveChoice").addEventListener("input",()=>{const amt=Number($("payAmount").value)||0,date=$("payDate").value;if(!amt||!date)return;const plan=buildAllocation(amt,date,Number($("saveChoice").value)||0);$("suggestion").innerHTML=planHtml("Updated paycheck plan",plan,"This week’s gas and groceries come first, then bills are paid off in due-date order, then your chosen savings amount. The rest is split evenly between groceries, gas and personal.")});
 $("recordPay").addEventListener("click",()=>{
  const amount=Number($("payAmount").value),date=$("payDate").value,savings=Number($("saveChoice").value)||0;
  if(!date||!amount||amount<=0){alert("Enter a payday and a paycheck amount greater than $0.");return}
