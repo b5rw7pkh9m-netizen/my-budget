@@ -280,26 +280,28 @@ function buildAllocation(amount,dateStr,savingsOverride){
   const put=Math.min(left,Math.max(0,desired));
   alloc[t.id]=Math.round(put*100)/100;left=Math.round((left-put)*100)/100;
  }
+ // No unallocated money: extra goes to savings. If you typed your own savings amount, extra goes to personal spending instead.
+ if(left>0){const dest=savingsOverride===undefined||!state.targets.some(t=>t.id==="personal")?"savings":"personal";alloc[dest]=Math.round(((alloc[dest]||0)+left)*100)/100;left=0}
  return {alloc,left};
 }
-function planHtml(title,plan,note){return `<strong>${title}</strong><br>${state.targets.map(t=>`${esc(t.name)}: <b>${money(plan.alloc[t.id]||0)}</b>`).join("<br>")}<br><br>Unallocated: <b>${money(plan.left)}</b><br><small>${note}</small>`}
+function planHtml(title,plan,note){return `<strong>${title}</strong><br>${state.targets.map(t=>`${esc(t.name)}: <b>${money(plan.alloc[t.id]||0)}</b>`).join("<br>")}<br><br><small>Every dollar of this paycheck is assigned. ${note}</small>`}
 function suggestion(){
  const amt=Number($("payAmount").value)||0,date=$("payDate").value;
  if(!amt||!date){$("suggestion").textContent="Enter your paycheck to see a suggested plan.";return}
  const plan=buildAllocation(amt,date),save=plan.alloc.savings||0;
  $("saveChoice").value=save.toFixed(2);
- $("suggestion").innerHTML=planHtml("Suggested paycheck plan",plan,"Targets are spread across the remaining Friday paydays this month. Upcoming fixed bills are protected first, then savings, then everyday spending. Adjust savings if needed.");
+ $("suggestion").innerHTML=planHtml("Suggested paycheck plan",plan,"Bills are covered first, then savings, then everyday spending. Anything extra goes to savings. If you lower the savings amount, the difference goes to personal spending.");
 }
 $("payDate").value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
 $("payAmount").addEventListener("input",suggestion);$("payDate").addEventListener("change",suggestion);
-$("saveChoice").addEventListener("input",()=>{const amt=Number($("payAmount").value)||0,date=$("payDate").value;if(!amt||!date)return;const plan=buildAllocation(amt,date,Number($("saveChoice").value)||0);$("suggestion").innerHTML=planHtml("Updated paycheck plan",plan,"Fixed bills are protected first, then your chosen savings amount, then everyday spending.")});
+$("saveChoice").addEventListener("input",()=>{const amt=Number($("payAmount").value)||0,date=$("payDate").value;if(!amt||!date)return;const plan=buildAllocation(amt,date,Number($("saveChoice").value)||0);$("suggestion").innerHTML=planHtml("Updated paycheck plan",plan,"Bills are covered first, then your chosen savings amount, then everyday spending. Anything extra goes to personal spending.")});
 $("recordPay").addEventListener("click",()=>{
  const amount=Number($("payAmount").value),date=$("payDate").value,savings=Number($("saveChoice").value)||0;
  if(!date||!amount||amount<=0){alert("Enter a payday and a paycheck amount greater than $0.");return}
  if(savings<0||savings>amount){alert("Savings must be between $0 and the paycheck amount.");return}
- const plan=buildAllocation(amount,date,savings),allocations=plan.alloc;
- state.paychecks.push({id:Date.now(),date,amount,savings,allocations});
- state.savingsBalance+=savings;persist();$("payAmount").value="";$("saveChoice").value="";$("suggestion").textContent="Enter your paycheck to see a suggested plan.";alert("Paycheck saved to your budget history.");document.querySelector('[data-tab="home"]').click();
+ const plan=buildAllocation(amount,date,savings),allocations=plan.alloc,saved=allocations.savings||0;
+ state.paychecks.push({id:Date.now(),date,amount,savings:saved,allocations});
+ state.savingsBalance+=saved;persist();$("payAmount").value="";$("saveChoice").value="";$("suggestion").textContent="Enter your paycheck to see a suggested plan.";alert("Paycheck saved to your budget history.");document.querySelector('[data-tab="home"]').click();
 });
 $("saveTarget").addEventListener("click",()=>{const id=$("editCategory").value,raw=$("editAmount").value,amt=Number(raw);if(raw===""||amt<0||!Number.isFinite(amt)){alert("Enter a valid monthly amount.");return}const t=state.targets.find(x=>x.id===id);if(t)t.amount=amt;persist();$("editAmount").value=""});
 $("editCategory").addEventListener("change",()=>{const t=state.targets.find(x=>x.id===$("editCategory").value);$("editAmount").value=t?.amount??""});
