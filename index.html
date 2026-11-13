@@ -62,11 +62,18 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
   <label for="accountEmail">Email</label><input id="accountEmail" type="email" autocomplete="email" placeholder="you@example.com">
   <label for="accountPassword">Password</label><input id="accountPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8">
   <div class="grid2"><button class="primary" id="signInBtn">Sign in</button><button class="secondary" id="signUpBtn" style="margin-top:13px">Create account</button></div>
+  <button class="secondary" id="forgotBtn" style="margin-top:10px;width:100%">Forgot password?</button>
   <div class="muted" id="authMessage" aria-live="polite" style="margin-top:9px">Cloud sync needs a one-time secure backend setup. Until then, the app continues saving on this device.</div>
  </div>
  <div id="signedInPanel" hidden>
   <p class="muted">Signed in as <strong id="accountLabel"></strong>. Your budget is linked to your private account.</p>
   <div class="grid2"><button class="secondary" id="syncNowBtn">Sync now</button><button class="danger" id="signOutBtn">Sign out</button></div>
+  <button class="secondary" id="changePassBtn" style="margin-top:10px;width:100%">Change password</button>
+  <div id="newPassBox" hidden>
+   <label for="newPassword">New password</label><input id="newPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8">
+   <button class="primary" id="setPassBtn">Save new password</button>
+  </div>
+  <div class="muted" id="passMessage" aria-live="polite" style="margin-top:9px"></div>
  </div>
 </section>
 <nav>
@@ -213,7 +220,7 @@ async function initCloud(){
  if(!window.supabase){authMsg("Couldn't load the sign-in system (you may be offline). Your budget is still saved on this device.");return}
  try{
   supabaseClient=window.supabase.createClient(cfg.url,k,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  supabaseClient.auth.onAuthStateChange((event,session)=>{const u=session?.user||null,changed=(u?.id||null)!==(activeUser?.id||null);showAccount(u);if(u&&(changed||event==="SIGNED_IN"))setTimeout(syncWithCloud,0)});
+  supabaseClient.auth.onAuthStateChange((event,session)=>{const u=session?.user||null,changed=(u?.id||null)!==(activeUser?.id||null);showAccount(u);if(event==="PASSWORD_RECOVERY"){$("newPassBox").hidden=false;$("passMessage").textContent="Choose a new password below, then tap Save new password.";setTimeout(()=>$("newPassword").focus(),300)}if(u&&(changed||event==="SIGNED_IN"))setTimeout(syncWithCloud,0)});
   authMsg("Sign in with your email and password, or create your account.");
  }catch(e){authMsg("Cloud setup could not be reached. Device-only saving remains available.");console.error(e)}
 }
@@ -234,6 +241,9 @@ async function authAction(mode){
 }
 $("signInBtn").addEventListener("click",()=>authAction("signin"));$("signUpBtn").addEventListener("click",()=>authAction("signup"));
 $("signOutBtn").addEventListener("click",async()=>{if(!supabaseClient)return;clearTimeout(syncTimer);await syncWithCloud();const {error}=await supabaseClient.auth.signOut();if(error)alert(error.message);else authMsg("Signed out. Your budget stays saved on this device.")});
+$("forgotBtn").addEventListener("click",async()=>{if(!supabaseClient){authMsg("Cloud login isn't switched on yet.");return}const email=$("accountEmail").value.trim();if(!/^\S+@\S+\.\S+$/.test(email)){authMsg("Type your email in the Email box above first, then tap Forgot password?");return}authMsg("Sending…");try{const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error;authMsg("Check your email for a password reset link. Open it on this phone; the app will open and ask for a new password.")}catch(e){authMsg(/rate limit/i.test(e.message||"")?"Too many emails sent recently. Please wait a while and try again.":friendlyAuthError(e))}});
+$("changePassBtn").addEventListener("click",()=>{const b=$("newPassBox");b.hidden=!b.hidden;$("passMessage").textContent=""});
+$("setPassBtn").addEventListener("click",async()=>{const pw=$("newPassword").value;if(pw.length<8){$("passMessage").textContent="Use at least 8 characters.";return}$("passMessage").textContent="Saving…";try{const {error}=await supabaseClient.auth.updateUser({password:pw});if(error)throw error;$("newPassword").value="";$("newPassBox").hidden=true;$("passMessage").textContent="Password updated. Use the new password from now on."}catch(e){$("passMessage").textContent=/reauth|recent/i.test(e.message||"")?"For security, sign out, use Forgot password?, and set it from the email link.":(e.message||"Couldn't update the password.")}});
 $("syncNowBtn").addEventListener("click",()=>{clearTimeout(syncTimer);syncWithCloud()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&activeUser)syncWithCloud()});
 window.addEventListener("online",()=>{if(activeUser)syncWithCloud()});
