@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101827">
+<meta name="theme-color" content="#101827" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +13,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>My Budget</title>
 <style>
-:root{--bg:#f4f6fa;--card:#fff;--ink:#172033;--muted:#697386;--line:#e6eaf0;--green:#16865b;--greenbg:#e8f6ef;--blue:#315ee8;--amber:#a96812;--amberbg:#fff5df;--red:#b83d45;--radius:18px}
+:root{--bg:#f4f6fa;--card:#fff;--ink:#172033;--muted:#697386;--line:#e6eaf0;--green:#16865b;--greenbg:#e8f6ef;--blue:#315ee8;--amber:#a96812;--amberbg:#fff5df;--notefg:#80520e;--red:#b83d45;--redbg:#fdecee;--track:#edf0f4;--field:#fff;--fieldline:#d9dee8;--dangerline:#f0d6d8;--activebg:#172033;--activefg:#fff;--radius:18px;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#0b0f17;--card:#151b26;--ink:#e8edf5;--muted:#9aa5b5;--line:#263041;--green:#41c48a;--greenbg:#143226;--amberbg:#33270f;--notefg:#f3c97a;--red:#ff7b85;--redbg:#3a1a1f;--track:#263041;--field:#0f141d;--fieldline:#2f3a4d;--dangerline:#5a2a31;--activebg:#e8edf5;--activefg:#101827}.card{box-shadow:none}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 header{background:#101827;color:white;padding:calc(24px + env(safe-area-inset-top)) 18px 20px;border-radius:0 0 24px 24px}
 .wrap{max-width:760px;margin:auto;padding:0 14px 36px}
@@ -21,32 +23,42 @@ header{background:#101827;color:white;padding:calc(24px + env(safe-area-inset-to
 .hero{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
 .heroBox{background:#1d2a40;border:1px solid #334158;border-radius:16px;padding:14px}.heroBox span{display:block;color:#b9c3d3;font-size:12px}.heroBox strong{display:block;font-size:25px;margin-top:7px}
 nav{display:flex;gap:7px;overflow:auto;padding:14px 0 10px;position:sticky;top:0;background:var(--bg);z-index:3}
-nav button{border:1px solid var(--line);background:white;color:var(--muted);padding:10px 13px;border-radius:999px;font-weight:650;white-space:nowrap}
-nav button.active{background:#172033;color:white;border-color:#172033}
+nav button{border:1px solid var(--line);background:var(--card);color:var(--muted);padding:10px 13px;border-radius:999px;font-weight:650;white-space:nowrap}
+nav button.active{background:var(--activebg);color:var(--activefg);border-color:var(--activebg)}
 main{padding-top:5px}.panel{display:none}.panel.active{display:block}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:17px;margin:10px 0;box-shadow:0 2px 8px #15213a08}
 h2{font-size:18px;margin:0 0 13px}h3{font-size:15px;margin:0}
 .muted{color:var(--muted);font-size:12px;line-height:1.45}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.big{font-size:27px;font-weight:800;letter-spacing:-.5px}.green{color:var(--green)}.pill{font-size:11px;border-radius:999px;padding:5px 8px;background:var(--greenbg);color:var(--green);font-weight:700}
-.progress{height:8px;border-radius:99px;background:#edf0f4;overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:var(--green);border-radius:99px}
+.progress{height:8px;border-radius:99px;background:var(--track);overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:var(--green);border-radius:99px}
 .item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0;padding-bottom:0}
-input,select{width:100%;padding:12px;border:1px solid #d9dee8;border-radius:11px;background:white;color:var(--ink);font:inherit;min-width:0}
+input,select{width:100%;padding:12px;border:1px solid var(--fieldline);border-radius:11px;background:var(--field);color:var(--ink);font:inherit;min-width:0}
 label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:11px 0 6px}
 button.primary{background:var(--green);color:white;border:0;padding:13px 15px;border-radius:12px;font-weight:750;width:100%;margin-top:13px}
-button.secondary{background:white;color:var(--ink);border:1px solid var(--line);padding:10px 12px;border-radius:11px;font-weight:650}
-button.danger{color:var(--red);background:white;border:1px solid #f0d6d8;padding:8px 10px;border-radius:9px}
+button.secondary{background:var(--card);color:var(--ink);border:1px solid var(--line);padding:10px 12px;border-radius:11px;font-weight:650}
+button.danger{color:var(--red);background:var(--card);border:1px solid var(--dangerline);padding:8px 10px;border-radius:9px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.amount{font-weight:750;font-variant-numeric:tabular-nums}
-.note{background:var(--amberbg);color:#80520e;padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin-top:12px}
+.note{background:var(--amberbg);color:var(--notefg);padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin-top:12px}
 .smallrow{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--line)}
 .smallrow:last-child{border:0}
 .empty{text-align:center;padding:22px;color:var(--muted);font-size:13px}
 .check{width:20px;height:20px;accent-color:var(--green)}
+body.locked .hero,body.locked nav,body.locked main,body.locked #syncStatus{display:none}
+.lockNote{display:none}body.locked .lockNote{display:block}
+.red{color:var(--red)}.pill.warn{background:var(--amberbg);color:var(--notefg)}.pill.bad{background:var(--redbg);color:var(--red)}
+.note.good{background:var(--greenbg);color:var(--green)}.note.bad{background:var(--redbg);color:var(--red)}
+.chart{position:relative;display:flex;align-items:flex-end;gap:8px;height:170px;padding-top:22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative}
+.bar i{display:block;width:100%;max-width:38px;background:var(--green);border-radius:6px 6px 0 0;min-height:2px}
+.barVal{font-size:10px;color:var(--muted);margin-bottom:3px;white-space:nowrap}.barLbl{position:absolute;bottom:-18px;font-size:11px;color:var(--muted)}
+.goalLine{position:absolute;left:0;right:0;border-top:1px dashed var(--muted);z-index:1}.goalLine span{position:absolute;left:0;top:-15px;font-size:10px;color:var(--muted)}
+.btnrow{display:flex;gap:8px;margin-top:8px}.btnrow button{padding:6px 10px}
 footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
 @media(min-width:600px){.wrap{padding-left:20px;padding-right:20px}.heroBox strong{font-size:30px}}
 </style>
 <script src="config.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="locked">
 <header><div class="wrap">
  <div class="top"><div><div class="brand">My Budget 💵</div><div class="sub">A clear plan for every Friday paycheck</div></div><div class="month" id="monthLabel"></div></div>
  <div class="hero">
@@ -58,7 +70,8 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
 <section class="card" id="accountCard" style="margin-top:14px">
  <div class="row"><h2>Private account & cloud backup</h2><span class="pill" id="syncStatus">Device only</span></div>
  <div id="signedOutPanel">
-  <p class="muted">Create your private sign-in to sync this budget across devices. Your data is isolated to your account.</p>
+  <p class="muted lockNote"><strong>🔒 Sign in to open your budget.</strong></p>
+  <p class="muted">Your budget is private to your account and syncs across your devices.</p>
   <label for="accountEmail">Email</label><input id="accountEmail" type="email" autocomplete="email" placeholder="you@example.com">
   <label for="accountPassword">Password</label><input id="accountPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8">
   <div class="grid2"><button class="primary" id="signInBtn">Sign in</button><button class="secondary" id="signUpBtn" style="margin-top:13px">Create account</button></div>
@@ -77,7 +90,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
  </div>
 </section>
 <nav>
- <button class="active" data-tab="home">Overview</button><button data-tab="pay">Add paycheck</button><button data-tab="bills">Bills & goals</button><button data-tab="history">History</button>
+ <button class="active" data-tab="home">Overview</button><button data-tab="pay">Paycheck</button><button data-tab="spend">Spending</button><button data-tab="bills">Bills</button><button data-tab="goals">Goals</button><button data-tab="history">History</button>
 </nav>
 <main>
 <section class="panel active" id="home">
@@ -85,6 +98,13 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
   <div class="row"><h2>Monthly budget progress</h2><span class="pill" id="monthStatus">In progress</span></div>
   <div class="muted">See how much of each monthly target you've funded. Add paychecks as they arrive.</div>
   <div id="budgetProgress"></div>
+ </div>
+ <div class="card">
+  <h2>This month's forecast</h2><div id="forecastBox"></div>
+ </div>
+ <div class="card">
+  <div class="row"><h2>Spending left this month</h2><button class="secondary" onclick="document.querySelector('[data-tab=spend]').click()">Log spending</button></div>
+  <div id="spendSummary"></div>
  </div>
  <div class="card">
   <h2>Your priorities</h2>
@@ -104,6 +124,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
 </section>
 <section class="panel" id="pay">
  <div class="card">
+  <div class="note" id="editBanner" hidden><span id="editBannerText"></span><br><button class="secondary" id="cancelEdit" style="margin-top:8px">Cancel editing</button></div>
   <h2>Add your Friday paycheck</h2>
   <div class="muted">Enter your take-home pay. The app will suggest an allocation using your monthly targets and what's already been funded.</div>
   <label for="payDate">Payday</label><input type="date" id="payDate">
@@ -117,7 +138,38 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
   <p class="muted">1. This week’s share of gas and groceries.<br>2. Bills are paid off completely, earliest due date first (recurring, phone, insurance, then rent).<br>3. Whatever is left is split evenly between savings, groceries, gas and personal, until each reaches its monthly target.<br>4. Once every target is full, extra goes to savings.<br><br>This records the plan only; it does not move money or pay bills.</p>
  </div>
 </section>
+<section class="panel" id="spend">
+ <div class="card">
+  <h2>Log spending</h2>
+  <div class="muted">Write down what you actually spend so you can see what's left in each category.</div>
+  <label for="expAmount">Amount ($)</label><input id="expAmount" type="number" min="0" step=".01" inputmode="decimal" placeholder="Example: 42.50">
+  <label for="expCat">Category</label><select id="expCat"></select>
+  <div class="grid2"><div><label for="expDate">Date</label><input id="expDate" type="date"></div><div><label for="expNote">Note (optional)</label><input id="expNote" maxlength="60" placeholder="Example: Circle K"></div></div>
+  <button class="primary" id="addExp">Add spending</button>
+  <div class="muted" id="expMsg" aria-live="polite" style="margin-top:8px"></div>
+ </div>
+ <div class="card"><h2>This month by category</h2><div id="spendByCat"></div></div>
+ <div class="card"><h2>Logged this month</h2><div id="expList"></div></div>
+</section>
+<section class="panel" id="goals">
+ <div class="card">
+  <h2>Emergency fund</h2><div id="efBox"></div>
+  <label for="efTarget">Your own target ($, optional)</label><input id="efTarget" type="number" min="0" step="1">
+  <button class="secondary" id="saveEf" style="margin-top:8px;width:100%">Save target (leave blank for the suggestion)</button>
+ </div>
+ <div class="card">
+  <h2>Affirm payoff</h2><div id="affirmBox"></div>
+  <div class="grid2"><div><label for="affirmBal">Remaining balance ($)</label><input id="affirmBal" type="number" min="0" step=".01"></div><div><label for="affirmPay">Monthly payment ($)</label><input id="affirmPay" type="number" min="0" step=".01" placeholder="26.76"></div></div>
+  <button class="secondary" id="saveAffirm" style="margin-top:8px;width:100%">Save Affirm balance</button>
+ </div>
+</section>
 <section class="panel" id="bills">
+ <div class="card">
+  <div class="row"><h2>Budget check</h2><span class="pill" id="healthPill">Check</span></div>
+  <div class="muted" id="healthBox"></div>
+  <div class="grid2"><div><label for="incLow">Monthly income, low ($)</label><input id="incLow" type="number" min="0" step="1"></div><div><label for="incHigh">Monthly income, high ($)</label><input id="incHigh" type="number" min="0" step="1"></div></div>
+  <button class="secondary" id="saveIncome" style="margin-top:8px;width:100%">Save income range</button>
+ </div>
  <div class="card">
   <h2>Bills and monthly targets</h2><div class="muted">These are your current planning estimates. Tap a bill to mark it paid for this month.</div>
   <div id="billList"></div>
@@ -139,10 +191,10 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
  </div>
  <div class="card">
   <h2>Add a budget item</h2>
-  <div class="muted">For example a single subscription, a pet budget, or a vacation fund.</div>
+  <div class="muted">For example a pet budget, a vacation fund, or a yearly cost like car registration or holidays.</div>
   <label for="newName">Name</label><input id="newName" maxlength="40" placeholder="Example: Spotify">
-  <label for="newAmount">Monthly amount ($)</label><input id="newAmount" type="number" min="0" step=".01" placeholder="Example: 11.99">
-  <label for="newKind">Type</label><select id="newKind"><option value="bill">Bill: paid off first, by due date</option><option value="spend">Everyday spending: shares the leftover</option><option value="savings">Savings goal: shares the leftover</option></select>
+  <label for="newAmount" id="newAmountLabel">Monthly amount ($)</label><input id="newAmount" type="number" min="0" step=".01" placeholder="Example: 11.99">
+  <label for="newKind">Type</label><select id="newKind"><option value="bill">Bill: paid off first, by due date</option><option value="spend">Everyday spending: shares the leftover</option><option value="savings">Savings goal: shares the leftover</option><option value="sinking">Yearly cost: set aside 1/12 every month</option></select>
   <div id="newDueWrap"><label for="newDue">Due day of the month (bills only, optional)</label><input id="newDue" type="number" min="1" max="31" step="1" placeholder="Example: 5"></div>
   <button class="primary" id="addItem">Add item</button>
  </div>
@@ -155,8 +207,10 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px}
  </div>
 </section>
 <section class="panel" id="history">
+ <div class="card"><h2>Month summary</h2><div id="summaryBox"></div></div>
+ <div class="card"><h2>Savings by month</h2><div id="chartBox"></div></div>
  <div class="card">
-  <h2>Paycheck history</h2><div id="historyList"></div>
+  <h2>Paycheck history</h2><div class="muted">Tap Edit to fix a paycheck, or Delete to remove one entered by mistake.</div><div id="historyList"></div>
  </div>
  <div class="card">
   <h2>Backup your budget</h2>
@@ -183,7 +237,7 @@ const defaults=[
 ];
 const key="myBudgetApp_v1", SAFETY_KEY=key+"_safetyCopy", TABLE="user_budgets";
 const SEED_SUBS=[["Netflix",null],["Planet Fitness",null],["Claude",null],["PlayStation",null],["Spotify",null],["Roblox Plus",null],["NZXT",null],["Affirm",26.76]];
-const blank=()=>({targets:defaults.map(x=>({...x})),paychecks:[],paid:{},savingsBalance:0,subscriptions:SEED_SUBS.map(([name,amount],i)=>({id:"seed"+i,name,amount,day:null})),updatedAt:0});
+const blank=()=>({targets:defaults.map(x=>({...x})),paychecks:[],paid:{},savingsBalance:0,subscriptions:SEED_SUBS.map(([name,amount],i)=>({id:"seed"+i,name,amount,day:null})),expenses:[],incomeLow:3500,incomeHigh:4000,emergencyTarget:null,affirm:{balance:null,payment:null},moved:{},updatedAt:0});
 const validBudget=x=>!!x&&typeof x==="object"&&Array.isArray(x.targets)&&Array.isArray(x.paychecks);
 // Stable text form of a budget (ignores key order and the timestamp) for comparing copies.
 function stable(v){if(Array.isArray(v))return "["+v.map(stable).join(",")+"]";if(v&&typeof v==="object")return "{"+Object.keys(v).filter(k=>k!=="updatedAt").sort().map(k=>JSON.stringify(k)+":"+stable(v[k])).join(",")+"}";return JSON.stringify(v)}
@@ -195,7 +249,12 @@ const $=id=>document.getElementById(id), money=n=>new Intl.NumberFormat("en-US",
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const today=new Date();const monthKey=d=>{let x=new Date(d+"T12:00:00");return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}`};
 const currentMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
-let supabaseClient=null, activeUser=null, syncTimer=null, syncing=false, syncAgain=false;
+let editingId=null;
+let supabaseClient=null, activeUser=null, syncTimer=null, syncing=false, syncAgain=false, lastSyncOk=false;
+// Login gate: the budget is only shown to a signed-in user. If the phone is offline, a remembered sign-in still opens it.
+function hasStoredSession(){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^sb-.*-auth-token$/.test(k)&&localStorage.getItem(k))return true}}catch(e){}return false}
+function setLocked(locked){document.body.classList.toggle("locked",!!locked);if(locked){$("signedOutPanel").hidden=false;$("signedInPanel").hidden=true}}
+setLocked(!(hasStoredSession()&&!navigator.onLine));
 function setSyncStatus(message){const el=$("syncStatus");if(el)el.textContent=message}
 function authMsg(t){$("authMessage").textContent=t}
 function saveLocal(){localStorage.setItem(key,JSON.stringify(state))}
@@ -233,16 +292,17 @@ async function syncWithCloud(){
    if(takeCloud){keepSafetyCopy(state,"this device's budget before the account copy replaced it");useCloudCopy(cloud,C);setSyncStatus("Cloud synced")}
    else{if(C>lastSync||lastSync===0)keepSafetyCopy(cloud,"the account's budget before this device's newer copy replaced it");await pushLocal();setSyncStatus("Cloud saved")}
   }
- }catch(e){console.error(e);setSyncStatus(navigator.onLine?"Sync issue":"Offline");authMsg(navigator.onLine?"Cloud sync problem: "+(e.message||"unknown error")+". Your budget is still saved on this device.":"You're offline. Changes are saved on this device and will sync when you're back online.")}
+  lastSyncOk=true;
+ }catch(e){lastSyncOk=false;console.error(e);setSyncStatus(!navigator.onLine?"Offline":/fetch|load failed|network|timeout|503|520|522|paused/i.test(e?.message||"")?"Can't reach cloud":"Sync issue");authMsg(cloudErrorMessage(e))}
  finally{syncing=false;if(syncAgain){syncAgain=false;syncWithCloud()}}
 }
-function showAccount(user){activeUser=user||null;$("signedOutPanel").hidden=!!user;$("signedInPanel").hidden=!user;if(user){$("accountLabel").textContent=user.email||"Private account";setSyncStatus("Connected")}else{setSyncStatus("Device only")}}
+function showAccount(user){activeUser=user||null;setLocked(!user&&!(hasStoredSession()&&!navigator.onLine));$("signedOutPanel").hidden=!!user;$("signedInPanel").hidden=!user;if(user){$("accountLabel").textContent=user.email||"Private account";setSyncStatus("Connected")}else{setSyncStatus("Device only")}}
 function isSecretKey(k){if(/^sb_secret_/i.test(k))return true;try{const p=JSON.parse(atob(k.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));return p.role==="service_role"}catch(e){return false}}
 async function initCloud(){
  const cfg=window.MY_BUDGET_SUPABASE||{}, k=String(cfg.publishableKey||cfg.anonKey||"").trim();
  if(!cfg.url||!k||k.startsWith("PASTE")){authMsg("Cloud sync isn't switched on yet: the publishable key still needs to be added to config.js. Your budget is still saved on this device.");return}
  if(isSecretKey(k)){authMsg("Security stop: config.js contains a SECRET key. Remove it and use your publishable key (starts with sb_publishable_). Cloud sync is off until then.");return}
- if(!window.supabase){authMsg("Couldn't load the sign-in system (you may be offline). Your budget is still saved on this device.");return}
+ if(!window.supabase){if(hasStoredSession()){setLocked(false);$("signedOutPanel").hidden=true;$("signedInPanel").hidden=false;$("accountLabel").textContent="your account (offline)";setSyncStatus("Offline")}else authMsg("Couldn't load the sign-in system. Check your internet connection and reopen the app.");return}
  try{
   supabaseClient=window.supabase.createClient(cfg.url,k,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   supabaseClient.auth.onAuthStateChange((event,session)=>{const u=session?.user||null,changed=(u?.id||null)!==(activeUser?.id||null);showAccount(u);if(event==="PASSWORD_RECOVERY"){$("newPassBox").hidden=false;$("passMessage").textContent="Choose a new password below, then tap Save new password.";setTimeout(()=>$("newPassword").focus(),300)}if(u&&(changed||event==="SIGNED_IN"))setTimeout(syncWithCloud,0)});
@@ -265,28 +325,35 @@ async function authAction(mode){
  }catch(e){authMsg(friendlyAuthError(e))}
 }
 $("signInBtn").addEventListener("click",()=>authAction("signin"));$("signUpBtn").addEventListener("click",()=>authAction("signup"));
-$("signOutBtn").addEventListener("click",async()=>{if(!supabaseClient)return;clearTimeout(syncTimer);await syncWithCloud();const {error}=await supabaseClient.auth.signOut();if(error)alert(error.message);else authMsg("Signed out. Your budget stays saved on this device.")});
+$("signOutBtn").addEventListener("click",async()=>{if(!supabaseClient)return;clearTimeout(syncTimer);for(let i=0;syncing&&i<100;i++)await new Promise(r=>setTimeout(r,100));await syncWithCloud();
+ const saved=lastSyncOk;
+ if(!saved&&!confirm("Your latest changes couldn't be saved to your account right now (you may be offline).\n\nSign out anyway? They'll stay hidden on this phone and sync the next time you sign in."))return;
+ const {error}=await supabaseClient.auth.signOut();if(error){alert(error.message);return}
+ if(saved){try{localStorage.removeItem(key);localStorage.removeItem(SAFETY_KEY)}catch(e){}state=blank();render();renderSafety()}
+ setLocked(true);authMsg(saved?"Signed out. Your budget is safely saved in your account and has been cleared from this phone.":"Signed out. Your unsaved changes are kept hidden on this phone until you sign in again.")});
 $("forgotBtn").addEventListener("click",async()=>{if(!supabaseClient){authMsg("Cloud login isn't switched on yet.");return}const email=$("accountEmail").value.trim();if(!/^\S+@\S+\.\S+$/.test(email)){authMsg("Type your email in the Email box above first, then tap Forgot password?");return}authMsg("Sending…");try{const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error;authMsg("Check your email for a password reset link. Open it on this phone; the app will open and ask for a new password.")}catch(e){authMsg(/rate limit/i.test(e.message||"")?"Too many emails sent recently. Please wait a while and try again.":friendlyAuthError(e))}});
 $("changePassBtn").addEventListener("click",()=>{const b=$("newPassBox");b.hidden=!b.hidden;$("passMessage").textContent=""});
 $("setPassBtn").addEventListener("click",async()=>{const pw=$("newPassword").value;if(pw.length<8){$("passMessage").textContent="Use at least 8 characters.";return}$("passMessage").textContent="Saving…";try{const {error}=await supabaseClient.auth.updateUser({password:pw});if(error)throw error;$("newPassword").value="";$("newPassBox").hidden=true;$("passMessage").textContent="Password updated. Use the new password from now on."}catch(e){$("passMessage").textContent=/reauth|recent/i.test(e.message||"")?"For security, sign out, use Forgot password?, and set it from the email link.":(e.message||"Couldn't update the password.")}});
 $("syncNowBtn").addEventListener("click",()=>{clearTimeout(syncTimer);syncWithCloud()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&activeUser)syncWithCloud()});
 window.addEventListener("online",()=>{if(activeUser)syncWithCloud()});
-function monthPays(){return state.paychecks.filter(p=>monthKey(p.date)===currentMonth)}
+function monthPays(m=currentMonth){return state.paychecks.filter(p=>monthKey(p.date)===m&&String(p.id)!==String(editingId))}
 function monthIncome(){return monthPays().reduce((s,p)=>s+p.amount,0)}
 function monthSaved(){return monthPays().reduce((s,p)=>s+p.savings,0)}
-function funded(id){return monthPays().reduce((s,p)=>s+(p.allocations?.[id]||0),0)}
+function funded(id,m=currentMonth){return monthPays(m).reduce((s,p)=>s+(p.allocations?.[id]||0),0)}
 function render(){
  $("monthLabel").textContent=today.toLocaleDateString("en-US",{month:"long",year:"numeric"});
  $("incomeTotal").textContent=money(monthIncome());$("savingsTotal").textContent=money(monthSaved());$("savingsBalance").textContent=money(state.savingsBalance);
  $("budgetProgress").innerHTML=state.targets.map(t=>{let f=funded(t.id),pct=Math.min(100,t.amount?f/t.amount*100:0);return `<div class="item"><div class="row"><div><h3>${esc(t.name)}</h3><div class="muted">${money(f)} funded of ${money(t.amount)}</div></div><strong class="amount">${Math.round(pct)}%</strong></div><div class="progress"><i style="width:${pct}%"></i></div></div>`}).join("");
  const upcoming=state.targets.filter(t=>t.kind==="bill").sort((a,b)=>dueDayOf(a)-dueDayOf(b));
  $("upcoming").innerHTML=upcoming.map(t=>`<div class="smallrow"><span>${esc(t.name)}<br><small class="muted">${esc(t.due)}</small></span><strong>${money(t.amount)}</strong></div>`).join("");
- $("billList").innerHTML=state.targets.map(t=>{let paid=!!state.paid[currentMonth+"_"+t.id];return `<div class="item"><div class="row"><div><h3>${esc(t.name)}</h3><div class="muted">${esc(t.due)} • ${money(t.amount)}/month${t.id==="recurring"&&(state.subscriptions||[]).length?` • includes ${state.subscriptions.length} subscriptions`:""}</div></div><label style="display:flex;align-items:center;gap:7px;margin:0"><input class="check paidToggle" type="checkbox" data-id="${esc(t.id)}" ${paid?"checked":""}> <span class="muted">Paid</span></label></div><button class="danger removeItem" data-id="${esc(t.id)}" style="margin-top:8px">Remove</button></div>`}).join("");
+ $("billList").innerHTML=state.targets.map(t=>{let paid=!!state.paid[currentMonth+"_"+t.id];return `<div class="item"><div class="row"><div><h3>${esc(t.name)}</h3><div class="muted">${esc(t.due)} • ${money(t.amount)}/month${t.sinking?` • saved so far ${money(sinkingSaved(t.id))} of ${money(t.yearly)} yearly`:""}${t.id==="recurring"&&(state.subscriptions||[]).length?` • includes ${state.subscriptions.length} subscriptions`:""}</div></div><label style="display:flex;align-items:center;gap:7px;margin:0"><input class="check paidToggle" type="checkbox" data-id="${esc(t.id)}" ${paid?"checked":""}> <span class="muted">Paid</span></label></div><button class="danger removeItem" data-id="${esc(t.id)}" style="margin-top:8px">Remove</button></div>`}).join("");
  document.querySelectorAll(".removeItem").forEach(el=>el.addEventListener("click",e=>removeItem(e.target.dataset.id)));
  document.querySelectorAll(".paidToggle").forEach(el=>el.addEventListener("change",e=>{state.paid[currentMonth+"_"+e.target.dataset.id]=e.target.checked;persist()}));
- $("historyList").innerHTML=state.paychecks.length?state.paychecks.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="item"><div class="row"><div><strong>${new Date(p.date+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</strong><div class="muted">Savings added: ${money(p.savings)}</div></div><strong class="amount">${money(p.amount)}</strong></div></div>`).join(""):`<div class="empty">No paychecks recorded yet. Your first Friday deposit will appear here.</div>`;
- renderSubs();
+ $("historyList").innerHTML=state.paychecks.length?state.paychecks.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="item"><div class="row"><div><strong>${new Date(p.date+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</strong><div class="muted">Savings added: ${money(p.savings)}</div></div><strong class="amount">${money(p.amount)}</strong></div><div class="btnrow"><button class="secondary editPay" data-id="${esc(p.id)}">Edit</button><button class="danger delPay" data-id="${esc(p.id)}">Delete</button></div></div>`).join(""):`<div class="empty">No paychecks recorded yet. Your first Friday deposit will appear here.</div>`;
+ document.querySelectorAll(".editPay").forEach(el=>el.addEventListener("click",e=>startEdit(e.target.dataset.id)));
+ document.querySelectorAll(".delPay").forEach(el=>el.addEventListener("click",e=>deletePay(e.target.dataset.id)));
+ renderSubs();renderSpending();renderHealth();renderForecast();renderSummary();renderEmergency();renderAffirm();renderChart();
  const sel=$("editCategory").value;$("editCategory").innerHTML=state.targets.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("");if(sel)$("editCategory").value=sel;
 }
 function remainingPaydays(dateStr){
@@ -301,11 +368,11 @@ function remainingPaydays(dateStr){
 const DUE_DAY={recurring:1,phone:14,insurance:15,housing:31};
 const dueDayOf=t=>Number(t.dueDay)||DUE_DAY[t.id]||28;
 function buildAllocation(amount,dateStr,savingsOverride){
- const count=remainingPaydays(dateStr),alloc={},has=id=>state.targets.some(t=>t.id===id);
+ const count=remainingPaydays(dateStr),alloc={},has=id=>state.targets.some(t=>t.id===id),pm=monthKey(dateStr);
  let left=Math.round(amount*100);
  if(!state.targets.length)return {alloc,left:left/100};
  const target=id=>Math.round((state.targets.find(t=>t.id===id)?.amount||0)*100);
- const need=id=>Math.max(0,target(id)-Math.round(funded(id)*100)-(alloc[id]||0));
+ const need=id=>Math.max(0,target(id)-Math.round(funded(id,pm)*100)-(alloc[id]||0));
  const give=(id,c)=>{c=Math.max(0,Math.min(left,Math.floor(c)));alloc[id]=(alloc[id]||0)+c;left-=c};
  state.targets.forEach(t=>alloc[t.id]=0);
  ["gas","groceries"].filter(has).forEach(id=>give(id,need(id)/count));
@@ -323,7 +390,7 @@ function buildAllocation(amount,dateStr,savingsOverride){
  Object.keys(alloc).forEach(k=>alloc[k]=alloc[k]/100);
  return {alloc,left:0};
 }
-function planHtml(title,plan,note){return `<strong>${title}</strong><br>${state.targets.map(t=>{const done=t.amount>0&&funded(t.id)+(plan.alloc[t.id]||0)>=t.amount-0.005;return `${esc(t.name)}: <b>${money(plan.alloc[t.id]||0)}</b>${done?" ✓ done for the month":""}`}).join("<br>")}<br><br><small>Every dollar of this paycheck is assigned. ${note}</small>`}
+function planHtml(title,plan,note){return `<strong>${title}</strong><br>${state.targets.map(t=>{const pm=$("payDate").value?monthKey($("payDate").value):currentMonth,done=t.amount>0&&funded(t.id,pm)+(plan.alloc[t.id]||0)>=t.amount-0.005;return `${esc(t.name)}: <b>${money(plan.alloc[t.id]||0)}</b>${done?" ✓ done for the month":""}`}).join("<br>")}<br><br><small>Every dollar of this paycheck is assigned. ${note}</small>`}
 function suggestion(){
  const amt=Number($("payAmount").value)||0,date=$("payDate").value;
  if(!amt||!date){$("suggestion").textContent="Enter your paycheck to see a suggested plan.";return}
@@ -339,22 +406,26 @@ $("recordPay").addEventListener("click",()=>{
  if(!date||!amount||amount<=0){alert("Enter a payday and a paycheck amount greater than $0.");return}
  if(savings<0||savings>amount){alert("Savings must be between $0 and the paycheck amount.");return}
  const plan=buildAllocation(amount,date,savings),allocations=plan.alloc,saved=Math.round(state.targets.filter(t=>t.kind==="savings").reduce((s,t)=>s+(allocations[t.id]||0),0)*100)/100;
+ if(editingId!==null){const i=state.paychecks.findIndex(x=>String(x.id)===String(editingId));const old=state.paychecks[i];
+  if(old){state.paychecks[i]={...old,date,amount,savings:saved,allocations};state.savingsBalance=Math.max(0,Math.round((state.savingsBalance-(old.savings||0)+saved)*100)/100)}
+  stopEdit();persist();alert("Paycheck updated.");document.querySelector('[data-tab="history"]').click();return}
  state.paychecks.push({id:Date.now(),date,amount,savings:saved,allocations});
- state.savingsBalance+=saved;persist();$("payAmount").value="";$("saveChoice").value="";$("suggestion").textContent="Enter your paycheck to see a suggested plan.";alert("Paycheck saved to your budget history.");document.querySelector('[data-tab="home"]').click();
+ state.savingsBalance=Math.round((state.savingsBalance+saved)*100)/100;persist();$("payAmount").value="";$("saveChoice").value="";$("suggestion").textContent="Enter your paycheck to see a suggested plan.";alert("Paycheck saved to your budget history.");document.querySelector('[data-tab="home"]').click();
 });
 function removeItem(id){const t=state.targets.find(x=>x.id===id);if(!t)return;if(state.targets.length<=1){alert("Keep at least one budget item.");return}
  if(!confirm(`Remove "${t.name}" from your budget?${id==="savings"?"\n\nThis is your main savings goal. The savings box on Add paycheck will stop being used.":""}\n\nPaychecks you already saved keep their history. You can add it back later.`))return;
  state.targets=state.targets.filter(x=>x.id!==id);persist()}
-$("newKind").addEventListener("change",()=>{$("newDueWrap").hidden=$("newKind").value!=="bill"});
+$("newKind").addEventListener("change",updateKindForm);
 $("addItem").addEventListener("click",()=>{const name=$("newName").value.trim(),raw=$("newAmount").value,amt=Number(raw),kind=$("newKind").value,dueRaw=$("newDue").value,due=Number(dueRaw);
  if(!name){alert("Give the item a name.");return}
  if(state.targets.some(t=>t.name.toLowerCase()===name.toLowerCase())){alert("You already have an item with that name.");return}
- if(raw===""||!Number.isFinite(amt)||amt<0){alert("Enter a valid monthly amount.");return}
+ if(raw===""||!Number.isFinite(amt)||amt<0){alert(kind==="sinking"?"Enter the yearly cost.":"Enter a valid monthly amount.");return}
  if(kind==="bill"&&dueRaw!==""&&!(Number.isInteger(due)&&due>=1&&due<=31)){alert("Due day must be a whole number from 1 to 31.");return}
  const item={id:"c_"+Date.now().toString(36),name,amount:Math.round(amt*100)/100,kind};
  if(kind==="bill"){if(dueRaw!==""){item.dueDay=due;item.due=`Due on day ${due}`}else item.due="Monthly"}else item.due=kind==="savings"?"Savings goal":"Monthly";
- state.targets.push(item);persist();["newName","newAmount","newDue"].forEach(i=>$(i).value="");alert(`"${name}" added.`)});
-$("saveTarget").addEventListener("click",()=>{const id=$("editCategory").value,raw=$("editAmount").value,amt=Number(raw);if(raw===""||amt<0||!Number.isFinite(amt)){alert("Enter a valid monthly amount.");return}const t=state.targets.find(x=>x.id===id);if(t)t.amount=amt;persist();$("editAmount").value=""});
+ if(kind==="sinking"){Object.assign(item,{kind:"bill",sinking:true,yearly:Math.round(amt*100)/100,amount:Math.round(amt/12*100)/100,dueDay:28,due:`Yearly cost ${money(amt)} ÷ 12`})}
+ state.targets.push(item);persist();["newName","newAmount","newDue"].forEach(i=>$(i).value="");alert(`"${name}" added${kind==="sinking"?` (${money(item.amount)} set aside each month)`:""}.`+overBudgetWarning())});
+$("saveTarget").addEventListener("click",()=>{const id=$("editCategory").value,raw=$("editAmount").value,amt=Number(raw);if(raw===""||amt<0||!Number.isFinite(amt)){alert("Enter a valid monthly amount.");return}const t=state.targets.find(x=>x.id===id);if(t){t.amount=amt;if(t.sinking)t.yearly=Math.round(amt*12*100)/100}persist();$("editAmount").value="";const w=overBudgetWarning();if(w)alert(w.trim())});
 $("editCategory").addEventListener("change",()=>{const t=state.targets.find(x=>x.id===$("editCategory").value);$("editAmount").value=t?.amount??""});
 function downloadJson(obj,name){const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 $("exportData").addEventListener("click",()=>downloadJson(state,`my-budget-backup-${new Date().toISOString().slice(0,10)}.json`));
@@ -449,6 +520,154 @@ $("bankFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!
  try{const {count,charges}=readStatement(await f.text());bankSuggestions=findRecurring(charges);renderBank(`Checked ${count} transactions.`)}
  catch(err){bankSuggestions=[];box.innerHTML=`<div class="note">${esc(err.message||"That file couldn't be read.")}</div>`}
  e.target.value=""});
+
+// ================= Added features =================
+const todayStr=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const monthName=m=>new Date(m+"-15T12:00:00").toLocaleDateString("en-US",{month:"long",year:"numeric"});
+const prevMonth=m=>{const [y,mo]=m.split("-").map(Number);const d=new Date(y,mo-2,15);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`};
+const shortDate=d=>new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+const targetsTotal=()=>Math.round(state.targets.reduce((s,t)=>s+(Number(t.amount)||0),0)*100)/100;
+function spent(id,m=currentMonth){return (state.expenses||[]).filter(e=>e.cat===id&&monthKey(e.date)===m).reduce((s,e)=>s+e.amount,0)}
+function monthSavedFor(m){return state.paychecks.filter(p=>monthKey(p.date)===m).reduce((s,p)=>s+(p.savings||0),0)+(Number(state.moved?.[m])||0)}
+
+// ---------- 1. Edit / delete paychecks ----------
+function startEdit(id){const p=state.paychecks.find(x=>String(x.id)===String(id));if(!p)return;editingId=p.id;
+ $("payDate").value=p.date;$("payAmount").value=p.amount;$("editBanner").hidden=false;$("editBannerText").textContent=`Editing the ${shortDate(p.date)} paycheck (${money(p.amount)}). Change it, then tap Save.`;
+ $("recordPay").textContent="Save changes";document.querySelector('[data-tab="pay"]').click();suggestion();$("saveChoice").value=(p.savings||0).toFixed(2);$("saveChoice").dispatchEvent(new Event("input"))}
+function stopEdit(){editingId=null;$("editBanner").hidden=true;$("recordPay").textContent="Save paycheck & allocation";$("payAmount").value="";$("saveChoice").value="";$("suggestion").textContent="Enter your paycheck to see a suggested plan."}
+$("cancelEdit").addEventListener("click",stopEdit);
+function deletePay(id){const p=state.paychecks.find(x=>String(x.id)===String(id));if(!p)return;
+ if(!confirm(`Delete the ${shortDate(p.date)} paycheck of ${money(p.amount)}?\n\nIts ${money(p.savings||0)} savings will be taken off your savings total. This can't be undone (but you can re-enter it).`))return;
+ state.paychecks=state.paychecks.filter(x=>x!==p);state.savingsBalance=Math.max(0,Math.round((state.savingsBalance-(p.savings||0))*100)/100);if(String(editingId)===String(p.id))stopEdit();persist()}
+
+// ---------- 2. Spending tracker ----------
+function renderSpending(){
+ const sel=$("expCat"),cur=sel.value;sel.innerHTML=state.targets.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("");if(cur&&state.targets.some(t=>t.id===cur))sel.value=cur;else if(state.targets.some(t=>t.id==="personal"))sel.value="personal";
+ const list=(state.expenses||[]).filter(e=>monthKey(e.date)===currentMonth).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+ const name=id=>state.targets.find(t=>t.id===id)?.name||"Removed item";
+ $("expList").innerHTML=list.length?list.map(e=>`<div class="smallrow"><span>${esc(name(e.cat))}${e.note?` • ${esc(e.note)}`:""}<br><small class="muted">${shortDate(e.date)}</small></span><span style="text-align:right;white-space:nowrap"><strong>${money(e.amount)}</strong><br><button class="danger delExp" data-id="${esc(e.id)}" style="padding:4px 8px;margin-top:4px">Delete</button></span></div>`).join(""):`<div class="empty">Nothing logged this month yet.</div>`;
+ document.querySelectorAll(".delExp").forEach(el=>el.addEventListener("click",ev=>{const e=state.expenses.find(x=>x.id===ev.target.dataset.id);if(e&&confirm(`Delete ${money(e.amount)} from ${name(e.cat)}?`)){state.expenses=state.expenses.filter(x=>x!==e);persist()}}));
+ const cats=state.targets.filter(t=>t.kind==="spend"||spent(t.id)>0);
+ const rows=cats.map(t=>{const s=spent(t.id),left=t.amount-s,pct=Math.min(100,t.amount?s/t.amount*100:(s?100:0)),over=left<-0.004;
+  return `<div class="item"><div class="row"><div><h3>${esc(t.name)}</h3><div class="muted">${money(s)} spent of ${money(t.amount)}</div></div><strong class="amount ${over?"red":"green"}">${over?money(-left)+" over":money(left)+" left"}</strong></div><div class="progress"><i style="width:${pct}%;${over?"background:var(--red)":""}"></i></div></div>`});
+ $("spendByCat").innerHTML=rows.join("")||`<div class="empty">No categories yet.</div>`;
+ const flex=state.targets.filter(t=>t.kind==="spend");
+ $("spendSummary").innerHTML=flex.length?flex.map(t=>{const left=t.amount-spent(t.id);return `<div class="smallrow"><span>${esc(t.name)}</span><strong class="${left<0?"red":""}">${left<0?money(-left)+" over":money(left)+" left"}</strong></div>`}).join(""):`<div class="empty">No everyday spending categories.</div>`;
+}
+$("expDate").value=todayStr();
+$("addExp").addEventListener("click",()=>{const raw=$("expAmount").value,a=Number(raw),cat=$("expCat").value,date=$("expDate").value,note=$("expNote").value.trim().slice(0,60);
+ if(raw===""||!Number.isFinite(a)||a<=0){alert("Enter how much you spent.");return}if(!date){alert("Pick a date.");return}if(!cat){alert("Pick a category.");return}
+ state.expenses=state.expenses||[];state.expenses.push({id:"e_"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),date,amount:Math.round(a*100)/100,cat,note});persist();
+ $("expAmount").value="";$("expNote").value="";const t=state.targets.find(x=>x.id===cat),left=t?t.amount-spent(cat,monthKey(date)):0;$("expMsg").textContent=t?`Logged. ${t.name}: ${left<0?money(-left)+" over budget":money(left)+" left"} for ${monthName(monthKey(date))}.`:"Logged."});
+
+// ---------- 3. Budget health check ----------
+function renderHealth(){
+ const tot=targetsTotal(),lo=Number(state.incomeLow)||0,hi=Number(state.incomeHigh)||lo,box=$("healthBox");
+ let cls="pill",msg;
+ if(!lo)msg=`Your monthly targets total <b>${money(tot)}</b>. Enter your expected income to check it.`;
+ else if(tot<=lo)msg=`✅ Your monthly targets total <b>${money(tot)}</b>. That fits your income of ${money(lo)}–${money(hi)}, with <b>${money(lo-tot)}</b> to spare even in a lower month.`;
+ else if(tot<=hi){msg=`⚠️ Your monthly targets total <b>${money(tot)}</b>. That's <b>${money(tot-lo)}</b> more than a ${money(lo)} month, so lower months won't cover everything.`;cls="pill warn"}
+ else{msg=`🛑 Your monthly targets total <b>${money(tot)}</b>, which is <b>${money(tot-hi)}</b> more than even a ${money(hi)} month. Lower some targets so bills and savings stay covered.`;cls="pill bad"}
+ box.innerHTML=msg;$("healthPill").className=cls;$("healthPill").textContent=!lo?"Check":tot<=lo?"Fits":tot<=hi?"Tight":"Over";
+ $("incLow").value=state.incomeLow??"";$("incHigh").value=state.incomeHigh??"";
+}
+$("saveIncome").addEventListener("click",()=>{const lo=Number($("incLow").value),hi=Number($("incHigh").value||$("incLow").value);if(!(lo>0)||!(hi>=lo)){alert("Enter a low and high monthly take-home amount (high must be at least the low).");return}state.incomeLow=Math.round(lo*100)/100;state.incomeHigh=Math.round(hi*100)/100;persist()});
+function overBudgetWarning(){const tot=targetsTotal(),lo=Number(state.incomeLow)||0;return lo&&tot>lo?`\n\nHeads up: your monthly targets now total ${money(tot)}, more than a ${money(lo)} month.`:""}
+
+// ---------- 4. Month forecast ----------
+function fridaysLeft(){const out=[],d=new Date(),end=new Date(d.getFullYear(),d.getMonth()+1,0,12);const have=new Set(monthPays().map(p=>p.date));
+ for(let x=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);x<=end;x.setDate(x.getDate()+1)){if(x.getDay()===5){const s=`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;if(!have.has(s))out.push(s)}}return out}
+function typicalPaycheck(){const recent=state.paychecks.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,4);if(recent.length)return Math.round(recent.reduce((s,p)=>s+p.amount,0)/recent.length*100)/100;return Math.round((Number(state.incomeLow)||3500)*12/52*100)/100}
+function renderForecast(){
+ const fr=fridaysLeft(),est=typicalPaycheck(),real=state.paychecks,doneOn={};
+ state.paychecks=real.slice();
+ try{
+  state.targets.forEach(t=>{if(t.amount>0&&funded(t.id)>=t.amount-0.005)doneOn[t.id]="done"});
+  for(const d of fr){const pl=buildAllocation(est,d);state.paychecks.push({id:"f"+d,date:d,amount:est,savings:pl.alloc.savings||0,allocations:pl.alloc});state.targets.forEach(t=>{if(!doneOn[t.id]&&t.amount>0&&funded(t.id)>=t.amount-0.005)doneOn[t.id]=d})}
+  const bills=state.targets.filter(t=>t.kind==="bill").sort((a,b)=>dueDayOf(a)-dueDayOf(b));
+  const lines=bills.map(t=>{const w=doneOn[t.id];return `<div class="smallrow"><span>${esc(t.name)}</span><strong class="${w?"green":"red"}">${w==="done"?"✓ Done":w?"✓ By "+shortDate(w):"⚠️ Short "+money(t.amount-funded(t.id))}</strong></div>`}).join("");
+  const sv=state.targets.find(t=>t.id==="savings"),saved=state.paychecks.filter(p=>monthKey(p.date)===currentMonth).reduce((s,p)=>s+(p.savings||0),0);
+  const short=bills.filter(t=>!doneOn[t.id]);
+  $("forecastBox").innerHTML=`<div class="muted">${fr.length?`${fr.length} Friday paycheck${fr.length>1?"s":""} left this month, estimated at about <b>${money(est)}</b> each (your recent average).`:"No Friday paychecks left this month."}</div>`+
+   `<div class="note ${short.length?"bad":"good"}">${short.length?`⚠️ At this rate, ${short.map(t=>esc(t.name)).join(", ")} may not be fully covered this month.`:`✅ All bills should be covered this month.`} Projected savings: <b>${money(saved)}</b>${sv?` (goal ${money(sv.amount)}${saved>=sv.amount-0.005?" ✓":""})`:""}.</div>`+lines;
+ }finally{state.paychecks=real}
+}
+
+// ---------- 5. Month summary + move unspent personal money ----------
+function monthSummary(m){
+ const pays=state.paychecks.filter(p=>monthKey(p.date)===m),inc=pays.reduce((s,p)=>s+p.amount,0),saved=pays.reduce((s,p)=>s+(p.savings||0),0);
+ const fundedM=id=>pays.reduce((s,p)=>s+(p.allocations?.[id]||0),0);
+ const bills=state.targets.filter(t=>t.kind==="bill"),billsShort=bills.filter(t=>fundedM(t.id)<t.amount-0.005);
+ const overs=state.targets.filter(t=>spent(t.id,m)>t.amount+0.004);
+ const sv=state.targets.find(t=>t.id==="savings"),per=state.targets.find(t=>t.id==="personal");
+ const unspent=per&&(state.expenses||[]).some(e=>monthKey(e.date)===m)?Math.max(0,Math.round((fundedM("personal")-spent("personal",m))*100)/100):0;
+ return {m,pays:pays.length,inc,saved,moved:Number(state.moved?.[m])||0,billsShort,overs,sv,per,unspent};
+}
+function renderSummary(){
+ const blocks=[prevMonth(currentMonth),currentMonth].map(m=>{const s=monthSummary(m),past=m!==currentMonth;
+  if(!s.pays&&!s.moved)return `<div class="item"><h3>${monthName(m)}</h3><div class="muted">No paychecks recorded.</div></div>`;
+  const goal=s.sv?(s.saved>=s.sv.amount-0.005?`✅ Savings goal met (${money(s.sv.amount)})`:`Savings goal ${money(s.sv.amount)}: ${money(s.sv.amount-s.saved)} to go`):"";
+  let move="";if(past&&s.moved)move=`<div class="pill" style="display:inline-block;margin-top:8px">Moved ${money(s.moved)} unspent personal money to savings ✓</div>`;
+  else if(past&&s.unspent>=0.01)move=`<button class="secondary moveUnspent" data-m="${m}" data-amt="${s.unspent}" style="margin-top:8px">Move ${money(s.unspent)} unspent personal money to savings</button>`;
+  return `<div class="item"><h3>${monthName(m)}${past?"":" (so far)"}</h3>
+   <div class="smallrow"><span>Income</span><strong>${money(s.inc)}</strong></div>
+   <div class="smallrow"><span>Saved</span><strong class="green">${money(s.saved+s.moved)}</strong></div>
+   <div class="muted">${goal}</div>
+   <div class="muted">${s.billsShort.length?(past?`⚠️ Not fully covered: `:`Still to fund: `)+s.billsShort.map(t=>esc(t.name)).join(", "):"✅ All bills covered"}</div>
+   <div class="muted">${s.overs.length?`Over budget: ${s.overs.map(t=>`${esc(t.name)} (+${money(spent(t.id,m)-t.amount)})`).join(", ")}`:"No categories over budget"}${(state.expenses||[]).some(e=>monthKey(e.date)===m)?"":" (no spending logged)"}</div>${move}</div>`}).join("");
+ $("summaryBox").innerHTML=blocks;
+ document.querySelectorAll(".moveUnspent").forEach(el=>el.addEventListener("click",e=>{const m=e.target.dataset.m,a=Number(e.target.dataset.amt);if(!confirm(`Add ${money(a)} of unspent ${monthName(m)} personal money to your savings total?`))return;state.moved=state.moved||{};state.moved[m]=a;state.savingsBalance=Math.round((state.savingsBalance+a)*100)/100;persist()}));
+}
+
+// ---------- 7. Emergency fund ----------
+function emergencyDefault(){return Math.round(state.targets.filter(t=>t.kind!=="savings").reduce((s,t)=>s+t.amount,0)*3*100)/100}
+function avgMonthlySavings(){const months=[...new Set(state.paychecks.map(p=>monthKey(p.date)))].sort().slice(-3);const sv=state.targets.find(t=>t.id==="savings");if(!months.length)return sv?sv.amount:0;return months.reduce((s,m)=>s+monthSavedFor(m),0)/months.length}
+function renderEmergency(){
+ const target=Number(state.emergencyTarget)||emergencyDefault(),have=Number(state.savingsBalance)||0,pct=Math.min(100,target?have/target*100:0),avg=avgMonthlySavings();
+ let eta;if(have>=target)eta="🎉 You've reached your emergency fund goal!";else if(avg>0){const n=Math.ceil((target-have)/avg),d=new Date();d.setMonth(d.getMonth()+n);eta=`At about ${money(avg)}/month, you'll get there in about <b>${n} month${n>1?"s":""}</b> (around ${d.toLocaleDateString("en-US",{month:"long",year:"numeric"})}).`}else eta="Add paychecks with savings to see an estimate.";
+ $("efBox").innerHTML=`<div class="row"><strong class="big green">${money(have)}</strong><span class="muted">of ${money(target)}</span></div><div class="progress"><i style="width:${pct}%"></i></div><div class="muted" style="margin-top:8px">${eta}</div><div class="muted">${state.emergencyTarget?"Your own target.":`Suggested target: 3 months of your non-savings budget.`} Uses your savings total from this app.</div>`;
+ $("efTarget").placeholder=String(emergencyDefault());
+}
+$("saveEf").addEventListener("click",()=>{const raw=$("efTarget").value,v=Number(raw);if(raw===""){state.emergencyTarget=null;persist();return}if(!(v>0)){alert("Enter a target amount, or leave it blank to use the suggestion.");return}state.emergencyTarget=Math.round(v*100)/100;$("efTarget").value="";persist()});
+
+// ---------- 8. Affirm payoff tracker ----------
+function affirmPayment(){const s=(state.subscriptions||[]).find(x=>/affirm/i.test(x.name));return Number(state.affirm?.payment)||Number(s?.amount)||26.76}
+function renderAffirm(){
+ const a=state.affirm||{},pay=affirmPayment(),bal=a.balance;
+ let html;
+ if(a.movedToSavings)html=`<div class="note good">🎉 Affirm is paid off, and ${money(a.movedToSavings)}/month now goes to savings.</div>`;
+ else if(bal==null)html=`<div class="muted">Enter your remaining Affirm balance to see your payoff date.</div>`;
+ else if(bal<=0.004)html=`<div class="note good">🎉 Affirm is paid off!</div><button class="primary" id="affirmToSavings">Move ${money(pay)}/month into savings</button>`;
+ else{const n=Math.ceil(bal/pay-1e-9),d=new Date();d.setMonth(d.getMonth()+n-1);
+  html=`<div class="row"><strong class="big">${money(bal)}</strong><span class="muted">left</span></div><div class="muted" style="margin:6px 0 4px">${n} payment${n>1?"s":""} of ${money(pay)} left. Paid off around <b>${d.toLocaleDateString("en-US",{month:"long",year:"numeric"})}</b>.</div><button class="secondary" id="affirmPaid" style="width:100%;margin-top:6px">I made a ${money(Math.min(pay,bal))} payment</button>`}
+ $("affirmBox").innerHTML=html;
+ const p=$("affirmPaid");if(p)p.addEventListener("click",()=>{state.affirm.balance=Math.max(0,Math.round((state.affirm.balance-Math.min(pay,state.affirm.balance))*100)/100);persist()});
+ const m=$("affirmToSavings");if(m)m.addEventListener("click",()=>{const rec=state.targets.find(t=>t.id==="recurring"),sv=state.targets.find(t=>t.kind==="savings");
+  if(!confirm(`Move ${money(pay)}/month from ${rec?rec.name:"your bills"} into ${sv?sv.name:"savings"}?`))return;
+  if(rec)rec.amount=Math.max(0,Math.round((rec.amount-pay)*100)/100);if(sv)sv.amount=Math.round((sv.amount+pay)*100)/100;
+  state.subscriptions=(state.subscriptions||[]).filter(x=>!/affirm/i.test(x.name));state.affirm={...state.affirm,movedToSavings:pay};persist()});
+}
+$("saveAffirm").addEventListener("click",()=>{const raw=$("affirmBal").value,v=Number(raw),rp=$("affirmPay").value,pv=Number(rp);
+ if(raw===""||!(v>=0)){alert("Enter your remaining Affirm balance.");return}if(rp!==""&&!(pv>0)){alert("Enter a valid monthly payment, or leave it blank.");return}
+ state.affirm={...(state.affirm||{}),balance:Math.round(v*100)/100,movedToSavings:null};if(rp!=="")state.affirm.payment=Math.round(pv*100)/100;$("affirmBal").value="";$("affirmPay").value="";persist()});
+
+// ---------- 9. Sinking funds (yearly costs) ----------
+function sinkingSaved(id){return state.paychecks.reduce((s,p)=>s+(p.allocations?.[id]||0),0)-(state.expenses||[]).filter(e=>e.cat===id).reduce((s,e)=>s+e.amount,0)}
+function updateKindForm(){const k=$("newKind").value;$("newDueWrap").hidden=k!=="bill";$("newAmountLabel").textContent=k==="sinking"?"Yearly cost ($)":"Monthly amount ($)";$("newAmount").placeholder=k==="sinking"?"Example: 240 (car registration)":"Example: 11.99"}
+
+// ---------- 12. Savings chart ----------
+function renderChart(){
+ const months=[];let m=currentMonth;for(let i=0;i<6;i++){months.unshift(m);m=prevMonth(m)}
+ const vals=months.map(x=>Math.round(monthSavedFor(x)*100)/100),max=Math.max(...vals,1),goal=state.targets.find(t=>t.id==="savings")?.amount||0;
+ const top=Math.max(max,goal);
+ $("chartBox").innerHTML=`<div class="chart" role="img" aria-label="Savings per month: ${months.map((x,i)=>monthName(x)+" "+money(vals[i])).join(", ")}">${goal?`<div class="goalLine" style="bottom:${goal/top*100}%"><span>goal ${money(goal)}</span></div>`:""}${months.map((x,i)=>`<div class="bar"><div class="barVal">${vals[i]?money(vals[i]).replace(".00",""):""}</div><i style="height:${vals[i]/top*100}%"></i><div class="barLbl">${new Date(x+"-15T12:00:00").toLocaleDateString("en-US",{month:"short"})}</div></div>`).join("")}</div><div class="muted" style="margin-top:6px">Includes savings from paychecks and unspent money you moved to savings.</div>`;
+}
+
+// ---------- 6. Clearer message when the cloud can't be reached ----------
+function cloudErrorMessage(e){const m=(e&&e.message)||"";
+ if(!navigator.onLine)return "You're offline. Changes are saved on this device and will sync when you're back online.";
+ if(/fetch|load failed|network|timeout|503|520|522|paused/i.test(m))return "Can't reach your cloud database right now. If this keeps happening for more than a few minutes, Supabase may have paused your free project after a week without use: open supabase.com, tap your project, then tap Resume project. Your budget is still saved on this phone.";
+ return "Cloud sync problem: "+(m||"unknown error")+". Your budget is still saved on this device.";}
 
 render();renderSafety();
 initCloud();
